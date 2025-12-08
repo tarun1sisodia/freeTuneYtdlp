@@ -1,12 +1,22 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-module.exports = {
-    port: process.env.PORT || 3001,
-
-    redis: {
+const redisConfig = process.env.REDIS_URL 
+    ? {
+        host: new URL(process.env.REDIS_URL).hostname,
+        port: parseInt(new URL(process.env.REDIS_URL).port) || 6379,
+        ...(process.env.REDIS_TOKEN && { password: process.env.REDIS_TOKEN }),
+        tls: process.env.REDIS_URL.startsWith('https') ? {} : undefined,
+    }
+    : {
         host: process.env.REDIS_HOST || 'localhost',
         port: process.env.REDIS_PORT || 6379,
-    },
+    };
+
+export default {
+    port: process.env.PORT || 3001,
+
+    redis: redisConfig,
 
     ytdlp: {
         maxConcurrent: parseInt(process.env.YTDLP_MAX_CONCURRENT) || 5,
@@ -18,6 +28,6 @@ module.exports = {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
         region: process.env.AWS_REGION || 'auto',
         endpoint: process.env.AWS_ENDPOINT, // Cloudflare R2 endpoint
-        bucket: process.env.R2_BUCKET_MUSIC || 'freetune-music',
+        bucket: process.env.R2_BUCKET_MUSIC || 'music',
     }
 };

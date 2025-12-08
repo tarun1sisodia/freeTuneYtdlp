@@ -1,11 +1,12 @@
-const express = require('express');
-const config = require('./config/config');
-const { addDownloadJob } = require('./queues/download.queue');
-require('./workers/download.worker');
-require('./workers/transcode.worker');
-require('./workers/upload.worker');
+import express from 'express';
+import config from './config/config.js';
+import { addDownloadJob } from './queues/download.queue.js';
+import './workers/download.worker.js';
+import './workers/transcode.worker.js';
+import './workers/upload.worker.js';
 
 const app = express();
+
 app.use(express.json());
 
 app.get('/health', (req, res) => {

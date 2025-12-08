@@ -1,10 +1,9 @@
-const { Worker } = require('bullmq');
-const config = require('../config/config');
-const ytdlpService = require('../services/ytdlp.service');
+import { Worker } from 'bullmq';
+import config from '../config/config.js';
+import ytdlpService from '../services/ytdlp.service.js';
+import { addTranscodeJob } from '../queues/transcode.queue.js';
 
 const connection = config.redis;
-
-const { addTranscodeJob } = require('../queues/transcode.queue');
 
 const downloadWorker = new Worker('download-queue', async (job) => {
     console.log(`Processing job ${job.id}: ${job.name}`);
@@ -46,4 +45,4 @@ downloadWorker.on('failed', (job, err) => {
     console.error(`Job ${job.id} failed with ${err.message}`);
 });
 
-module.exports = downloadWorker;
+export default downloadWorker;

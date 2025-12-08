@@ -1,7 +1,7 @@
-const { Worker } = require('bullmq');
-const config = require('../config/config');
-const storageService = require('../services/storage.service');
-const fs = require('fs');
+import { Worker } from 'bullmq';
+import config from '../config/config.js';
+import storageService from '../services/storage.service.js';
+import fs from 'fs';
 
 const connection = config.redis;
 
@@ -30,4 +30,4 @@ const uploadWorker = new Worker('upload-queue', async (job) => {
     }
 }, { connection });
 
-module.exports = uploadWorker;
+export default uploadWorker;

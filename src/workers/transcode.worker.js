@@ -1,7 +1,7 @@
-const { Worker } = require('bullmq');
-const config = require('../config/config');
-const transcodeService = require('../services/transcode.service');
-const { addUploadJob } = require('../queues/upload.queue');
+import { Worker } from 'bullmq';
+import config from '../config/config.js';
+import transcodeService from '../services/transcode.service.js';
+import { addUploadJob } from '../queues/upload.queue.js';
 
 const connection = config.redis;
 
@@ -29,4 +29,4 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
     }
 }, { connection });
 
-module.exports = transcodeWorker;
+export default transcodeWorker;

@@ -1,8 +1,8 @@
-const { S3Client } = require('@aws-sdk/client-s3');
-const { Upload } = require('@aws-sdk/lib-storage');
-const fs = require('fs');
-const path = require('path');
-const config = require('../config/config');
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import fs from 'fs';
+import path from 'path';
+import config from '../config/config.js';
 
 class StorageService {
     constructor() {
@@ -70,4 +70,4 @@ class StorageService {
     }
 }
 
-module.exports = new StorageService();
+export default new StorageService();

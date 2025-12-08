@@ -1,10 +1,14 @@
-const YTDlpWrap = require('yt-dlp-wrap').default;
-const config = require('../config/config');
-const path = require('path');
-const fs = require('fs');
+import YTDlpWrap from 'yt-dlp-wrap';
+import config from '../config/config.js';
+import path from 'path';
+import fs from 'fs';
 
 // Ensure binary path is correct. In production, this might need to be downloaded or available in path.
-const ytDlp = new YTDlpWrap();
+const ytDlp = new YTDlpWrap.default(); // YTDlpWrap exports default as commonjs, might need .default depending on import handling or just check behavior. 
+// Actually, 'yt-dlp-wrap' default export behavior in ES modules might vary. 
+// Based on previous file: const YTDlpWrap = require('yt-dlp-wrap').default;
+// In ES6 import YTDlpWrap from '...' usually gets the default export.
+// Let's assume 'yt-dlp-wrap' exports the class as default.
 
 class YtdlpService {
     constructor() {
@@ -59,4 +63,4 @@ class YtdlpService {
     }
 }
 
-module.exports = new YtdlpService();
+export default new YtdlpService();

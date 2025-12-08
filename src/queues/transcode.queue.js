@@ -1,20 +1,16 @@
-const { Queue } = require('bullmq');
-const config = require('../config/config');
+import { Queue } from 'bullmq';
+import config from '../config/config.js';
 
-const transcodeQueue = new Queue('transcode-queue', {
+export const transcodeQueue = new Queue('transcode-queue', {
     connection: config.redis
 });
 
-module.exports = {
-    transcodeQueue,
-
-    addTranscodeJob: async (data) => {
-        return await transcodeQueue.add('transcode-audio', data, {
-            attempts: 3,
-            backoff: {
-                type: 'exponential',
-                delay: 1000,
-            },
-        });
-    }
+export const addTranscodeJob = async (data) => {
+    return await transcodeQueue.add('transcode-audio', data, {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 1000,
+        },
+    });
 };

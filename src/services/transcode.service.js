@@ -1,7 +1,7 @@
-const ffmpeg = require('fluent-ffmpeg');
-const path = require('path');
-const fs = require('fs');
-const config = require('../config/config');
+import ffmpeg from 'fluent-ffmpeg';
+import path from 'path';
+import fs from 'fs';
+import config from '../config/config.js';
 
 class TranscodeService {
     /**
@@ -66,4 +66,4 @@ class TranscodeService {
     }
 }
 
-module.exports = new TranscodeService();
+export default new TranscodeService();

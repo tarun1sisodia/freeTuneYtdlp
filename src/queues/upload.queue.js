@@ -1,20 +1,16 @@
-const { Queue } = require('bullmq');
-const config = require('../config/config');
+import { Queue } from 'bullmq';
+import config from '../config/config.js';
 
-const uploadQueue = new Queue('upload-queue', {
+export const uploadQueue = new Queue('upload-queue', {
     connection: config.redis
 });
 
-module.exports = {
-    uploadQueue,
-
-    addUploadJob: async (data) => {
-        return await uploadQueue.add('upload-files', data, {
-            attempts: 5,
-            backoff: {
-                type: 'exponential',
-                delay: 2000,
-            },
-        });
-    }
+export const addUploadJob = async (data) => {
+    return await uploadQueue.add('upload-files', data, {
+        attempts: 5,
+        backoff: {
+            type: 'exponential',
+            delay: 2000,
+        },
+    });
 };

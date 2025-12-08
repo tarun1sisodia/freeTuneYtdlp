@@ -1,8 +1,8 @@
-const ytdlpService = require('./ytdlp.service');
+import ytdlpService from './ytdlp.service.js';
 
 // Simple script to test yt-dlp wrapper manually
 async function test() {
-    console.log('Testing yt-dlp service...');
+console.log('Testing yt-dlp service...');
 
     try {
         const query = 'Tu hai kahan';
