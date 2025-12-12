@@ -17,6 +17,28 @@ class StorageService {
     }
 
     /**
+     * Download file from R2 to local path
+     * @param {string} key - R2 object key
+     * @param {string} downloadPath - Local path to save the file
+     */
+    async downloadFile(key, downloadPath) {
+        const { GetObjectCommand } = await import('@aws-sdk/client-s3');
+        const command = new GetObjectCommand({
+            Bucket: config.aws.bucket,
+            Key: key,
+        });
+
+        const response = await this.s3Client.send(command);
+        const fileStream = fs.createWriteStream(downloadPath);
+
+        return new Promise((resolve, reject) => {
+            response.Body.pipe(fileStream)
+                .on('error', reject)
+                .on('finish', () => resolve(downloadPath));
+        });
+    }
+
+    /**
      * Upload a single file to R2
      * @param {string} filePath 
      * @param {string} key 
