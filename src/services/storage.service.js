@@ -6,6 +6,11 @@ import config from '../config/config.js';
 
 class StorageService {
     constructor() {
+        console.log('Initializing S3 with:');
+        console.log('Endpoint:', config.aws.endpoint);
+        console.log('Region:', config.aws.region);
+        console.log('KeyID:', config.aws.accessKeyId ? config.aws.accessKeyId.substring(0, 5) + '...' : 'undefined');
+
         this.s3Client = new S3Client({
             region: config.aws.region,
             endpoint: config.aws.endpoint,
