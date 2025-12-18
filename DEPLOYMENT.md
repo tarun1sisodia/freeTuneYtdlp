@@ -59,3 +59,8 @@ docker run -d -p 3002:3002 --env-file .env freetune-ytdlp
 
 - **"yt-dlp binary not found"**: The service will attempt to download it automatically on the first request.
 - **Permission Denied**: The Dockerfile sets `chmod +x` on the binary folder to ensure the downloaded file is executable.
+- **Railway Not Auto-Deploying?**: 
+    1. Go to **Settings** -> **Git**.
+    2. Ensure **"Triggers"** is enabled for the `main` branch.
+    3. Ensure **"Watch Paths"** is empty (or correctly set to `/` since this is a standalone repo).
+    4. Verify you pushed to the same branch Railway is linked to (usually `main`).

@@ -5,7 +5,7 @@ async function test() {
 
     try {
         // Test 1: Search Query
-        console.log('\nTesting Search Query: "faded alan walker"');
+        console.log('\nTesting Search Query: "Tere ishk mein"');
         const metadataSearch = await ytdlpService.getMetadata('faded alan walker');
         console.log('Search Metadata Title:', metadataSearch.title);
         console.log('Search Metadata URL:', metadataSearch.webpage_url);
