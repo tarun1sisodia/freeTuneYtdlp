@@ -13,6 +13,11 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'freeTuneYtdlp' });
 });
 
+// Root, useful for default healthchecks in some cloud providers
+app.get('/', (req, res) => {
+    res.send('FreeTune yt-dlp Service is Running');
+});
+
 app.post('/download', async (req, res) => {
     const { query, url } = req.body;
 
