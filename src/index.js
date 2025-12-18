@@ -15,8 +15,15 @@ app.get('/health', (req, res) => {
 
 app.post('/download', async (req, res) => {
     const { query, url } = req.body;
-    if (!query && !url) {
-        return res.status(400).json({ error: 'Missing query or url' });
+
+    // Strict Input Validation
+    if ((!query && !url) || (query && typeof query !== 'string') || (url && typeof url !== 'string')) {
+        return res.status(400).json({ error: 'Missing or invalid query/url' });
+    }
+
+    // Input Length Validation (DoS Prevention)
+    if ((query && query.length > 500) || (url && url.length > 500)) {
+        return res.status(400).json({ error: 'Input too long' });
     }
 
     try {

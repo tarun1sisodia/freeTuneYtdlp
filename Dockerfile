@@ -36,5 +36,10 @@ EXPOSE 3002
 ENV NODE_ENV=production
 ENV PORT=3002
 
+# Security: Run as non-root user
+# The node image already comes with a 'node' user
+RUN chown -R node:node /app
+USER node
+
 # Start the application
 CMD ["npm", "start"]

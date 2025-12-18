@@ -8,6 +8,7 @@
         "start": "node src/index.js",
         "dev": "nodemon src/index.js",
         "update-ytdlp": "node src/scripts/update-ytdlp.js",
+        "test-security": "node src/scripts/test-ytdlp.js",
         "test": "jest"
     },
     "dependencies": {

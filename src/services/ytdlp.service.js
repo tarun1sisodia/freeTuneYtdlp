@@ -27,6 +27,20 @@ class YtdlpService {
     }
 
     /**
+     * Validates and sanitizes the input URL or query
+     * @param {string} input 
+     * @returns {boolean}
+     */
+    isValidInput(input) {
+        if (!input || typeof input !== 'string') return false;
+        // Block file:// protocol and other dangerous patterns
+        if (input.match(/^(file|ftp|local|data):/i)) return false;
+        // Block internal IP ranges (basic check)
+        if (input.match(/(^|\s|@)(localhost|127\.|169\.254\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1]))/)) return false;
+        return true;
+    }
+
+    /**
      * Fetch video metadata
      * @param {string} query - Search query or URL
      * @returns {Promise<any>}
@@ -34,9 +48,22 @@ class YtdlpService {
     async getMetadata(query) {
         await this.ensureBinary();
 
+        if (!this.isValidInput(query)) {
+            throw new Error('Invalid or restricted input query/url');
+        }
+
         try {
             const isUrl = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+/.test(query);
-            const args = ['--dump-json'];
+
+            // Security flags to prevent SSRF and DoS
+            const securityArgs = [
+                '--force-ipv4',
+                '--no-check-certificate', // Sometimes needed but can be risky, keep strict if possible. Let's stick to safe defaults.
+                '--match-filter', 'duration < 1200', // Max 20 mins to prevent huge downloads DOS
+                '--max-filesize', '100M', // Hard limit 100MB
+            ];
+
+            const args = ['--dump-json', ...securityArgs];
 
             if (isUrl) {
                 args.push(query);
@@ -61,7 +88,18 @@ class YtdlpService {
     async downloadAudio(url, jobId) {
         await this.ensureBinary();
 
+        if (!this.isValidInput(url)) {
+            throw new Error('Invalid or restricted input URL');
+        }
+
         const outputPath = path.join(this.downloadPath, `${jobId}.mp3`);
+
+        // Security flags
+        const securityArgs = [
+            '--force-ipv4',
+            '--match-filter', 'duration < 1200',
+            '--max-filesize', '100M',
+        ];
 
         // Command to download best audio and convert to mp3
         const args = [
@@ -69,7 +107,8 @@ class YtdlpService {
             '-x', // Extract audio
             '--audio-format', 'mp3',
             '--audio-quality', '0', // Best quality
-            '-o', outputPath
+            '-o', outputPath,
+            ...securityArgs
         ];
 
         return new Promise((resolve, reject) => {
