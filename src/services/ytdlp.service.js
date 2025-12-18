@@ -1,20 +1,28 @@
-import YTDlpWrap from 'yt-dlp-wrap';
-import config from '../config/config.js';
+import YTDlpWrapPkg from 'yt-dlp-wrap';
+const YTDlpWrap = YTDlpWrapPkg.default;
 import path from 'path';
 import fs from 'fs';
-
-// Ensure binary path is correct. In production, this might need to be downloaded or available in path.
-const ytDlp = new YTDlpWrap.default(); // YTDlpWrap exports default as commonjs, might need .default depending on import handling or just check behavior. 
-// Actually, 'yt-dlp-wrap' default export behavior in ES modules might vary. 
-// Based on previous file: const YTDlpWrap = require('yt-dlp-wrap').default;
-// In ES6 import YTDlpWrap from '...' usually gets the default export.
-// Let's assume 'yt-dlp-wrap' exports the class as default.
+import { updateYtDlp, BINARY_PATH } from '../scripts/update-ytdlp.js';
 
 class YtdlpService {
     constructor() {
         this.downloadPath = path.join(process.cwd(), 'downloads');
         if (!fs.existsSync(this.downloadPath)) {
             fs.mkdirSync(this.downloadPath);
+        }
+
+        // Initialize wrapper with designated binary path
+        // We will check for existence in methods to allow async update
+        this.ytDlp = new YTDlpWrap(BINARY_PATH);
+    }
+
+    /**
+     * Ensures the binary exists before operation
+     */
+    async ensureBinary() {
+        if (!fs.existsSync(BINARY_PATH)) {
+            console.log('yt-dlp binary not found, triggering update...');
+            await updateYtDlp();
         }
     }
 
@@ -24,12 +32,19 @@ class YtdlpService {
      * @returns {Promise<any>}
      */
     async getMetadata(query) {
+        await this.ensureBinary();
+
         try {
-            // ytsearch1: searches for the first result
-            const result = await ytDlp.execPromise([
-                '--dump-json',
-                `ytsearch1:${query}`
-            ]);
+            const isUrl = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+/.test(query);
+            const args = ['--dump-json'];
+
+            if (isUrl) {
+                args.push(query);
+            } else {
+                args.push(`ytsearch1:${query}`);
+            }
+
+            const result = await this.ytDlp.execPromise(args);
             return JSON.parse(result);
         } catch (error) {
             console.error('YTDLP Metadata Error:', error);
@@ -44,6 +59,8 @@ class YtdlpService {
      * @returns {Promise<string>} - Path to downloaded file
      */
     async downloadAudio(url, jobId) {
+        await this.ensureBinary();
+
         const outputPath = path.join(this.downloadPath, `${jobId}.mp3`);
 
         // Command to download best audio and convert to mp3
@@ -56,7 +73,7 @@ class YtdlpService {
         ];
 
         return new Promise((resolve, reject) => {
-            ytDlp.exec(args)
+            this.ytDlp.exec(args)
                 .on('error', (error) => reject(error))
                 .on('close', () => resolve(outputPath));
         });

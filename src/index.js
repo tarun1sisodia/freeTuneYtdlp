@@ -28,6 +28,25 @@ app.post('/download', async (req, res) => {
     }
 });
 
-app.listen(config.port, () => {
+import { updateYtDlp } from './scripts/update-ytdlp.js';
+
+app.listen(config.port, async () => {
     console.log(`freeTuneYtdlp service running on port ${config.port}`);
+
+    // Initial check on startup
+    try {
+        await updateYtDlp();
+    } catch (err) {
+        console.error('Initial yt-dlp update failed, proceeding with existing binary if available:', err);
+    }
+
+    // Schedule daily check (24 hours * 60 minutes * 60 seconds * 1000 ms)
+    setInterval(async () => {
+        try {
+            console.log('Running daily yt-dlp update check...');
+            await updateYtDlp();
+        } catch (err) {
+            console.error('Scheduled yt-dlp update failed:', err);
+        }
+    }, 24 * 60 * 60 * 1000);
 });
