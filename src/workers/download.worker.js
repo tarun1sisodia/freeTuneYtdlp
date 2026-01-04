@@ -11,11 +11,20 @@ const downloadWorker = new Worker('download-queue', async (job) => {
 
     try {
         // 1. Get Metadata (if not provided)
+        // 1. Get Metadata (Always fetch to ensure DB has info)
         let targetUrl = url;
         let metadata = {};
-        if (!url && query) {
-            metadata = await ytdlpService.getMetadata(query);
-            targetUrl = metadata.webpage_url;
+
+        const input = url || query;
+        if (input) {
+            console.log(`Fetching metadata for: ${input}`);
+            metadata = await ytdlpService.getMetadata(input);
+
+            // If we started with a query, use the resolved URL
+            if (!url && metadata.webpage_url) {
+                targetUrl = metadata.webpage_url;
+            }
+
             await job.updateProgress({ step: 'metadata', metadata });
         }
 
@@ -26,7 +35,7 @@ const downloadWorker = new Worker('download-queue', async (job) => {
         // 3. Queue for Transcoding
         await addTranscodeJob({
             filePath,
-            originalId: job.id || songId, // Pass original ID for consistency
+            originalId: job.id, // Pass job.id as originalId
             metadata
         });
 
