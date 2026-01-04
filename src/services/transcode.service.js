@@ -31,6 +31,7 @@ class TranscodeService {
             qualities.forEach((q) => {
                 command
                     .output(path.join(outputDir, `${q.name}.m3u8`))
+                    .addOption('-map', '0:a') // Explicitly map input audio to this output
                     .audioCodec('aac')
                     .audioBitrate(q.bitrate)
                     .format('hls')
@@ -41,6 +42,7 @@ class TranscodeService {
 
             command
                 .on('end', () => {
+                    console.log('FFmpeg transcoding finished');
                     // Generate master playlist manually or assume client handles variant selection
                     // For simplicity, we will create a basic master playlist pointing to variants
                     this.createMasterPlaylist(outputMasterPlaylist, qualities);
@@ -55,6 +57,7 @@ class TranscodeService {
     }
 
     createMasterPlaylist(outputPath, qualities) {
+        console.log(`Creating master playlist at ${outputPath}`);
         let content = '#EXTM3U\n#EXT-X-VERSION:3\n';
         qualities.forEach(q => {
             // Approximate bandwidth calculation
@@ -63,6 +66,7 @@ class TranscodeService {
             content += `${q.name}.m3u8\n`;
         });
         fs.writeFileSync(outputPath, content);
+        console.log('Master playlist created successfully');
     }
 }
 
