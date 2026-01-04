@@ -22,7 +22,9 @@ const uploadWorker = new Worker('upload-queue', async (job) => {
         return {
             uploaded: true,
             keyPrefix,
-            url: `https://${config.aws.bucket}.r2.cloudflarestorage.com/${keyPrefix}/master.m3u8`
+            url: `https://${config.aws.bucket}.r2.cloudflarestorage.com/${keyPrefix}/master.m3u8`,
+            originalId,
+            metadata: job.data.metadata || {}
         };
     } catch (error) {
         console.error(`Upload job ${job.id} failed:`, error);
