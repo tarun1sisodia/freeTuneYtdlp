@@ -107,6 +107,7 @@ class YtdlpService {
             '-x', // Extract audio
             '--audio-format', 'mp3',
             '--audio-quality', '0', // Best quality
+            '-f', 'bestaudio', // Force best audio quality source
             '-o', outputPath,
             ...securityArgs
         ];
