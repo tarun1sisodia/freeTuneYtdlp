@@ -3,7 +3,9 @@ import config from '../config/config.js';
 import ytdlpService from '../services/ytdlp.service.js';
 import { addTranscodeJob } from '../queues/transcode.queue.js';
 
-const connection = config.redis;
+import { getRedisConnection } from '../config/redis.js';
+
+const connection = getRedisConnection();
 
 const downloadWorker = new Worker('download-queue', async (job) => {
     console.log(`Processing job ${job.id}: ${job.name}`);
@@ -44,7 +46,12 @@ const downloadWorker = new Worker('download-queue', async (job) => {
         console.error(`Job ${job.id} failed:`, error);
         throw error;
     }
-}, { connection });
+}, {
+    connection,
+    metrics: {
+        maxDataPoints: 0
+    }
+});
 
 downloadWorker.on('completed', (job) => {
     console.log(`Job ${job.id} completed!`);

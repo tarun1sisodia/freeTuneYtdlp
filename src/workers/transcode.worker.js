@@ -6,7 +6,9 @@ import { addUploadJob } from '../queues/upload.queue.js';
 import path from 'path';
 import fs from 'fs';
 
-const connection = config.redis;
+import { getRedisConnection } from '../config/redis.js';
+
+const connection = getRedisConnection();
 
 const transcodeWorker = new Worker('transcode-queue', async (job) => {
     console.log(`Processing transcode job ${job.id}`);
@@ -44,6 +46,11 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
         console.error(`Transcode job ${job.id} failed:`, error);
         throw error;
     }
-}, { connection });
+}, {
+    connection,
+    metrics: {
+        maxDataPoints: 0
+    }
+});
 
 export default transcodeWorker;

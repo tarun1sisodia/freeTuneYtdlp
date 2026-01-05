@@ -3,7 +3,9 @@ import config from '../config/config.js';
 import storageService from '../services/storage.service.js';
 import fs from 'fs';
 
-const connection = config.redis;
+import { getRedisConnection } from '../config/redis.js';
+
+const connection = getRedisConnection();
 
 const uploadWorker = new Worker('upload-queue', async (job) => {
     console.log(`Processing upload job ${job.id}`);
@@ -30,6 +32,11 @@ const uploadWorker = new Worker('upload-queue', async (job) => {
         console.error(`Upload job ${job.id} failed:`, error);
         throw error;
     }
-}, { connection });
+}, {
+    connection,
+    metrics: {
+        maxDataPoints: 0
+    }
+});
 
 export default uploadWorker;
