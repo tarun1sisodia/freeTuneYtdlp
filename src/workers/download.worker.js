@@ -47,7 +47,7 @@ const downloadWorker = new Worker('download-queue', async (job) => {
         throw error;
     }
 }, {
-    connection,
+    connection: config.redis, // Use config to create fresh connection matching our requirements
     metrics: {
         maxDataPoints: 0
     }

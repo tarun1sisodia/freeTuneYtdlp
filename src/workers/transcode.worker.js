@@ -47,7 +47,7 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
         throw error;
     }
 }, {
-    connection,
+    connection: config.redis,
     metrics: {
         maxDataPoints: 0
     }

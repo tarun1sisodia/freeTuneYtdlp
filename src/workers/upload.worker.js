@@ -33,7 +33,7 @@ const uploadWorker = new Worker('upload-queue', async (job) => {
         throw error;
     }
 }, {
-    connection,
+    connection: config.redis,
     metrics: {
         maxDataPoints: 0
     }
