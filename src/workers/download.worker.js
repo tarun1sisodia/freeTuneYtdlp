@@ -37,8 +37,10 @@ const downloadWorker = new Worker('download-queue', async (job) => {
         // 3. Queue for Transcoding
         await addTranscodeJob({
             filePath,
-            originalId: job.id, // Pass job.id as originalId
-            metadata
+            originalId: job.data.songId || job.id, // Use provided songId or fallback to job.id
+            metadata,
+            songId: job.data.songId, // Explicitly pass songId if available
+            userId: job.data.userId
         });
 
         return { filePath, status: 'downloaded' };

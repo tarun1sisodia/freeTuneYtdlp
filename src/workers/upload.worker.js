@@ -16,17 +16,19 @@ const uploadWorker = new Worker('upload-queue', async (job) => {
         // Key structure: songId/master.m3u8, songId/low.m3u8, etc.
         const keyPrefix = `songs/${originalId}`;
         await storageService.uploadDirectory(hlsPath, keyPrefix);
+        const uploadResult = await storageService.uploadDirectory(hlsPath, keyPrefix);
 
         // 2. Cleanup Local Files (Optional but recommended)
         fs.rmSync(hlsPath, { recursive: true, force: true });
 
         console.log(`Job ${job.id} uploaded to ${keyPrefix}`);
         return {
-            uploaded: true,
-            keyPrefix,
-            url: `https://${config.aws.bucket}.r2.cloudflarestorage.com/${keyPrefix}/master.m3u8`,
-            originalId,
-            metadata: job.data.metadata || {}
+            url: uploadResult.url, // Master playlist URL
+            keyPrefix: uploadResult.keyPrefix, // Directory key in R2
+            originalId: job.data.originalId,
+            songId: job.data.songId,
+            metadata: job.data.metadata,
+            userId: job.data.userId
         };
     } catch (error) {
         console.error(`Upload job ${job.id} failed:`, error);

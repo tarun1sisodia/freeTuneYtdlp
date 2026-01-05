@@ -35,9 +35,11 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
 
         // 2. Queue for Upload
         await addUploadJob({
-            hlsPath,
-            originalId: songId || job.id, // Use songId for R2 uploads, job.id for scraping
-            metadata: job.data.metadata
+            transcodePath: hlsPath,
+            originalId: job.data.originalId,
+            songId: job.data.songId,
+            metadata: job.data.metadata,
+            userId: job.data.userId
         });
 
         console.log(`Job ${job.id} transcoded to ${hlsPath}`);
