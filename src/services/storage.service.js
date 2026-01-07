@@ -83,7 +83,15 @@ class StorageService {
         });
 
         await Promise.all(uploads);
-        return keyPrefix;
+
+        const baseUrl = config.aws.publicUrl || `https://${config.aws.bucket}.r2.cloudflarestorage.com`;
+        const masterUrl = `${baseUrl}/${keyPrefix}/master.m3u8`;
+
+        return {
+            success: true,
+            keyPrefix,
+            url: masterUrl
+        };
     }
 
     getContentType(filePath) {

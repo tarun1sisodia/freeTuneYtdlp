@@ -15,7 +15,6 @@ const uploadWorker = new Worker('upload-queue', async (job) => {
         // 1. Upload Directory to R2
         // Key structure: songId/master.m3u8, songId/low.m3u8, etc.
         const keyPrefix = `songs/${originalId}`;
-        await storageService.uploadDirectory(hlsPath, keyPrefix);
         const uploadResult = await storageService.uploadDirectory(hlsPath, keyPrefix);
 
         // 2. Cleanup Local Files (Optional but recommended)

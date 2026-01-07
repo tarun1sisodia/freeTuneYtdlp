@@ -32,5 +32,6 @@ export default {
             ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
             : process.env.AWS_ENDPOINT,
         bucket: process.env.R2_BUCKET_NAME || process.env.R2_BUCKET_MUSIC || 'music',
+        publicUrl: process.env.R2_PUBLIC_URL,
     }
 };
