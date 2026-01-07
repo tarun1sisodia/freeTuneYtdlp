@@ -2,6 +2,7 @@ import { Worker } from 'bullmq';
 import config from '../config/config.js';
 import ytdlpService from '../services/ytdlp.service.js';
 import { addTranscodeJob } from '../queues/transcode.queue.js';
+import crypto from 'crypto';
 
 import { getRedisConnection } from '../config/redis.js';
 
@@ -12,8 +13,8 @@ const downloadWorker = new Worker('download-queue', async (job) => {
     const { query, url } = job.data;
 
     try {
-        // 1. Get Metadata (if not provided)
-        // 1. Get Metadata (Always fetch to ensure DB has info)
+        // 1. Get Metadata & Determine ID
+        const currentSongId = job.data.songId || crypto.randomUUID();
         let targetUrl = url;
         let metadata = {};
 
@@ -31,15 +32,16 @@ const downloadWorker = new Worker('download-queue', async (job) => {
         }
 
         // 2. Download Audio
-        const filePath = await ytdlpService.downloadAudio(targetUrl, job.id);
-        console.log(`Job ${job.id} downloaded to ${filePath}`);
+        // Use consistent ID for file naming
+        const filePath = await ytdlpService.downloadAudio(targetUrl, currentSongId);
+        console.log(`Job ${job.id} downloaded to ${filePath} (ID: ${currentSongId})`);
 
         // 3. Queue for Transcoding
         await addTranscodeJob({
             filePath,
-            originalId: job.data.songId || job.id, // Use provided songId or fallback to job.id
+            originalId: currentSongId, // Pass the UUID
+            songId: currentSongId,     // Pass the UUID
             metadata,
-            songId: job.data.songId, // Explicitly pass songId if available
             userId: job.data.userId
         });
 

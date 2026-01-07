@@ -30,14 +30,16 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
         }
 
         // 1. Transcode to HLS
-        const hlsPath = await transcodeService.transcodeToHls(filePath, job.id);
+        // Use the stable ID for the HLS directory, not the ephemeral job ID
+        const stableId = job.data.songId || job.data.originalId || job.id;
+        const hlsPath = await transcodeService.transcodeToHls(filePath, stableId);
         await job.updateProgress({ step: 'transcoded', hlsPath });
 
         // 2. Queue for Upload
         await addUploadJob({
-            transcodePath: hlsPath,
-            originalId: job.data.originalId,
-            songId: job.data.songId,
+            hlsPath,
+            originalId: stableId,
+            songId: stableId,
             metadata: job.data.metadata,
             userId: job.data.userId
         });

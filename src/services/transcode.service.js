@@ -35,7 +35,7 @@ class TranscodeService {
                     .audioCodec('aac')
                     .audioBitrate(q.bitrate)
                     .format('hls')
-                    .addOption('-hls_time', '6') // 6 second segments
+                    .addOption('-hls_time', '4') // 4 second segments for faster load
                     .addOption('-hls_list_size', '0') // All segments in playlist
                     .addOption('-hls_segment_filename', path.join(outputDir, `${q.name}_%03d.ts`));
             });
