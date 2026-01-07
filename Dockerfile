@@ -1,5 +1,5 @@
 # Use Node.js as the base image
-FROM node:25.2.1-slim
+FROM node:22-slim
 
 # Install system dependencies
 # ffmpeg is required for audio processing
