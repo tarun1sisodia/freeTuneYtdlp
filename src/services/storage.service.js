@@ -1,5 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import config from '../config/config.js';
@@ -11,6 +13,11 @@ class StorageService {
         console.log('Region:', config.aws.region);
         console.log('KeyID:', config.aws.accessKeyId ? config.aws.accessKeyId.substring(0, 5) + '...' : 'undefined');
 
+        // Create a custom agent to increase max sockets
+        const agent = new https.Agent({
+            maxSockets: 200, // Increase from default 50
+        });
+
         this.s3Client = new S3Client({
             region: config.aws.region,
             endpoint: config.aws.endpoint,
@@ -18,6 +25,10 @@ class StorageService {
                 accessKeyId: config.aws.accessKeyId,
                 secretAccessKey: config.aws.secretAccessKey,
             },
+            requestHandler: new NodeHttpHandler({
+                httpsAgent: agent,
+                socketAcquisitionWarningTimeout: 10000,
+            }),
         });
     }
 
