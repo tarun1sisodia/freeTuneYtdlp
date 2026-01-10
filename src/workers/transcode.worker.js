@@ -29,6 +29,11 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
             console.log(`Download complete.`);
         }
 
+        // 0.5 Pre-transcode check
+        if (!filePath || !fs.existsSync(filePath)) {
+            throw new Error(`Input file not found for transcoding: ${filePath}`);
+        }
+
         // 1. Transcode to HLS
         // Use the stable ID for the HLS directory, not the ephemeral job ID
         const stableId = job.data.songId || job.data.originalId || job.id;
@@ -40,8 +45,10 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
             hlsPath,
             originalId: stableId,
             songId: stableId,
+            songId: stableId,
             metadata: job.data.metadata,
-            userId: job.data.userId
+            userId: job.data.userId,
+            originalMp3Path: filePath // Pass original MP3 for direct upload
         });
 
         console.log(`Job ${job.id} transcoded to ${hlsPath}`);

@@ -42,7 +42,9 @@ const downloadWorker = new Worker('download-queue', async (job) => {
             originalId: currentSongId, // Pass the UUID
             songId: currentSongId,     // Pass the UUID
             metadata,
-            userId: job.data.userId
+            userId: job.data.userId,
+            sourceUrl: url || targetUrl, // Pass original URL for context
+            query // Pass original query for context
         });
 
         return { filePath, status: 'downloaded' };

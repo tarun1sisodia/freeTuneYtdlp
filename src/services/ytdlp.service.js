@@ -115,7 +115,13 @@ class YtdlpService {
         return new Promise((resolve, reject) => {
             this.ytDlp.exec(args)
                 .on('error', (error) => reject(error))
-                .on('close', () => resolve(outputPath));
+                .on('close', () => {
+                    if (fs.existsSync(outputPath)) {
+                        resolve(outputPath);
+                    } else {
+                        reject(new Error(`Download completed but file not found at ${outputPath}`));
+                    }
+                });
         });
     }
 }
