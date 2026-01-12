@@ -12,7 +12,7 @@ const connection = getRedisConnection();
 
 const transcodeWorker = new Worker('transcode-queue', async (job) => {
     console.log(`Processing transcode job ${job.id}`);
-    let { filePath, source, fileKey, songId } = job.data;
+    let { filePath, source, fileKey, songId, thumbnailPath } = job.data;
 
     try {
         // 0. Download from R2 if needed
@@ -48,7 +48,8 @@ const transcodeWorker = new Worker('transcode-queue', async (job) => {
             songId: stableId,
             metadata: job.data.metadata,
             userId: job.data.userId,
-            originalMp3Path: filePath // Pass original MP3 for direct upload
+            originalMp3Path: filePath, // Pass original MP3 for direct upload
+            thumbnailPath // Pass thumbnail path for upload
         });
 
         console.log(`Job ${job.id} transcoded to ${hlsPath}`);

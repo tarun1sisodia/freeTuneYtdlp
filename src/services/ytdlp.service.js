@@ -109,6 +109,8 @@ class YtdlpService {
             '--audio-quality', '0', // Best quality
             '-f', 'bestaudio', // Force best audio quality source
             '-o', outputPath,
+            '--write-thumbnail', // Download thumbnail
+            '--convert-thumbnails', 'jpg', // Convert to consistent format
             ...securityArgs
         ];
 
@@ -117,7 +119,14 @@ class YtdlpService {
                 .on('error', (error) => reject(error))
                 .on('close', () => {
                     if (fs.existsSync(outputPath)) {
-                        resolve(outputPath);
+                        // Find the thumbnail (it will be named {jobId}.jpg due to -o {jobId}.mp3 + --convert-thumbnails jpg)
+                        // Actually, yt-dlp might name it {jobId}.jpg if output is {jobId}.mp3
+                        const thumbnailPath = path.join(this.downloadPath, `${jobId}.jpg`);
+
+                        resolve({
+                            audioPath: outputPath,
+                            thumbnailPath: fs.existsSync(thumbnailPath) ? thumbnailPath : null
+                        });
                     } else {
                         reject(new Error(`Download completed but file not found at ${outputPath}`));
                     }

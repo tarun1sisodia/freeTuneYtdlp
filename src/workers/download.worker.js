@@ -33,12 +33,14 @@ const downloadWorker = new Worker('download-queue', async (job) => {
 
         // 2. Download Audio
         // Use consistent ID for file naming
-        const filePath = await ytdlpService.downloadAudio(targetUrl, currentSongId);
+        const { audioPath: filePath, thumbnailPath } = await ytdlpService.downloadAudio(targetUrl, currentSongId);
         console.log(`Job ${job.id} downloaded to ${filePath} (ID: ${currentSongId})`);
+        if (thumbnailPath) console.log(`Thumbnail downloaded to ${thumbnailPath}`);
 
         // 3. Queue for Transcoding
         await addTranscodeJob({
             filePath,
+            thumbnailPath, // Pass thumbnail path
             originalId: currentSongId, // Pass the UUID
             songId: currentSongId,     // Pass the UUID
             metadata,
