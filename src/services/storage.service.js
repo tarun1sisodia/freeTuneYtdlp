@@ -61,7 +61,8 @@ class StorageService {
         });
 
         await upload.done();
-        return `https://${config.aws.bucket}.r2.cloudflarestorage.com/${key}`; // Or your public domain
+        const baseUrl = config.aws.publicUrl || `https://${config.aws.bucket}.r2.cloudflarestorage.com`;
+        return `${baseUrl}/${key}`;
     }
 
     /**
