@@ -10,6 +10,7 @@ const connection = getRedisConnection();
 const uploadWorker = new Worker('upload-queue', async (job) => {
     console.log(`Processing upload job ${job.id}`);
     const { hlsPath, originalId, originalMp3Path } = job.data;
+    console.log(`Upload Worker: Checking path ${hlsPath} (Exists: ${fs.existsSync(hlsPath)})`);
 
     try {
         // 1. Upload Directory to R2 (HLS)

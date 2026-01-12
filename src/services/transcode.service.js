@@ -47,6 +47,15 @@ class TranscodeService {
                     // Generate master playlist manually or assume client handles variant selection
                     // For simplicity, we will create a basic master playlist pointing to variants
                     this.createMasterPlaylist(outputMasterPlaylist, qualities);
+
+                    // Verify output exists
+                    if (!fs.existsSync(outputMasterPlaylist)) {
+                        const err = new Error(`Transcoding failed: Master playlist not found at ${outputMasterPlaylist}`);
+                        console.error(err);
+                        reject(err);
+                        return;
+                    }
+
                     resolve(outputDir);
                 })
                 .on('error', (err) => {
